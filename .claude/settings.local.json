@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_install",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__search_files",
+      "WebFetch(domain:claude.ai)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(test:*)",
+      "Bash(git pull:*)",
+      "Bash(git branch:*)",
+      "Bash(npm test:*)",
+      "Bash(cargo:*)",
+      "Bash(pnpm test:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run coverage:*)",
+      "Bash(sed:*)",
+      "Bash(npx vite:*)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:anthropic.com)",
+      "Bash(git reset:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
