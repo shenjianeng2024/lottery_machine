@@ -9,7 +9,7 @@ import {
   createInitialLotteryState,
   validateCycleFairnessWithPrizes,
   generateLotteryStats,
-} from '../../lib/lotteryEngine';
+} from '../../src/lib/lotteryEngine';
 import {
   PrizeColor,
   Prize,
@@ -19,7 +19,7 @@ import {
   LotteryErrorCode,
   createDefaultPrizes,
   DEFAULT_LOTTERY_CONFIG,
-} from '../../types/lottery';
+} from '../../src/types/lottery';
 
 describe('Lottery System Integration Tests', () => {
   let engine: LotteryEngine;

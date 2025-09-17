@@ -15,7 +15,7 @@ import {
   useGPUAcceleration,
   autoTunePerformance,
   getPerformanceRecommendations
-} from '../lib/performanceOptimization';
+} from '../../src/lib/performanceOptimization';
 
 // 模拟 performance API
 const mockPerformance = {

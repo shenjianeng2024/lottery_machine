@@ -19,7 +19,10 @@
       "Bash(npx vite:*)",
       "WebFetch(domain:localhost)",
       "WebFetch(domain:anthropic.com)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git remote add:*)",
+      "Bash(git remote remove:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

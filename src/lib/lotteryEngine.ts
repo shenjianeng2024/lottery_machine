@@ -3,6 +3,17 @@
  *
  * 实现周期性抽奖算法，确保每个周期内每种颜色恰好被抽中2次
  * 采用费雪-耶茨洗牌算法确保随机性和公平性
+ * 
+ * Modbus寄存器机制：
+ * - 621: 抽奖结果输出 (红色=1, 黄色=2, 蓝色=3)
+ * - 601: 软件状态指示 (1=正在选取奖品, 0=奖品到达出料口)
+ * - 602: 出料状态指示 (1=奖品到达出料口, 0=奖品被取走)
+ * 
+ * 工作流程：
+ * 1. 抽奖时立即写入621寄存器
+ * 2. 601=1表示软件收到抽奖结果正在选取奖品
+ * 3. 601=0表示奖品到达出料口，同时602=1
+ * 4. 602=0表示奖品被取走
  */
 
 import {
@@ -18,6 +29,7 @@ import {
   createNewCycle,
   DEFAULT_LOTTERY_CONFIG,
 } from '../types/lottery';
+import { modbusWriteSingleSmart } from './tauri-api';
 
 /**
  * 抽奖引擎核心实现类
@@ -59,12 +71,61 @@ export class LotteryEngineImpl implements LotteryEngine {
     // 从选中颜色的奖品中随机选择一个
     const selectedPrize = this.selectRandomPrize(state.availablePrizes, selectedColor);
 
+    // 立即写入621寄存器
+    let modbusWriteStatus: {
+      success: boolean;
+      address: number;
+      value: number;
+      error?: string;
+    } | undefined;
+
+    try {
+      let colorValue: number;
+      switch (selectedColor) {
+        case PrizeColor.Red:
+          colorValue = 1;
+          break;
+        case PrizeColor.Yellow:
+          colorValue = 2;
+          break;
+        case PrizeColor.Blue:
+          colorValue = 3;
+          break;
+        default:
+          colorValue = 0;
+      }
+      
+      
+      try {
+        const writeResult = await modbusWriteSingleSmart(621, colorValue);
+      } catch (writeError) {
+        console.error(`❌ [抽奖引擎] 写入地址R621失败:`, writeError);
+        throw writeError;
+      }
+      
+      modbusWriteStatus = {
+        success: true,
+        address: 621,
+        value: colorValue
+      };
+    } catch (error) {
+      console.error('❌ 抽奖引擎写入Modbus地址R621失败:', error);
+      modbusWriteStatus = {
+        success: false,
+        address: 621,
+        value: 0,
+        error: error instanceof Error ? error.message : '未知错误'
+      };
+      // 不影响抽奖流程，只记录错误
+    }
+
     // 创建抽奖结果
     const result: LotteryResult = {
       prizeId: selectedPrize.id,
       timestamp: Date.now(),
       cycleId: currentCycle.id,
       drawNumber: currentCycle.results.length + 1,
+      modbusWriteStatus,
     };
 
     // 更新周期状态

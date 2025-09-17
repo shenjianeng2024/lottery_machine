@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createNewCycle, createDefaultPrizes, DEFAULT_LOTTERY_CONFIG } from '../../types/lottery';
-import type { LotteryState, PrizeColor } from '../../types/lottery';
+import { createNewCycle, createDefaultPrizes, DEFAULT_LOTTERY_CONFIG } from '../../src/types/lottery';
+import type { LotteryState, PrizeColor } from '../../src/types/lottery';
 
 // 模拟Tauri API - 需要在导入前定义
 vi.mock('@tauri-apps/api/core', () => ({
@@ -23,7 +23,7 @@ import {
   storageService,
   useLotteryStorage,
   StorageError
-} from '../../lib/tauri-api';
+} from '../../src/lib/tauri-api';
 import { invoke } from '@tauri-apps/api/core';
 
 const mockInvoke = vi.mocked(invoke);

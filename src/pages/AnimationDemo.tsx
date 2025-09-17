@@ -161,11 +161,9 @@ export const AnimationDemo: React.FC = () => {
                 prizes={prizes}
                 performanceMode={performanceMode}
                 onAnimationStart={() => {
-                  console.log('高级动画开始');
                   setIsAdvancedAnimating(true);
                 }}
                 onAnimationComplete={(prizeId) => {
-                  console.log('高级动画完成，中奖奖品ID:', prizeId);
                   const prize = prizes.find(p => p.id === prizeId);
                   if (prize) {
                     setLastResult(prize.name);
@@ -272,9 +270,9 @@ export const AnimationDemo: React.FC = () => {
   prizes={lotteryState.availablePrizes}
   enabled={true}
   performanceMode="normal"
-  onAnimationStart={() => console.log('动画开始')}
+  onAnimationStart={() => {}}
   onAnimationComplete={(prizeId) => {
-    console.log('中奖奖品:', prizeId);
+    // 处理中奖结果
   }}
 />`}
                 </pre>

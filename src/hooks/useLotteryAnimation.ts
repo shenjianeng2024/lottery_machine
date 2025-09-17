@@ -205,9 +205,8 @@ export function useLotteryAnimation(
         setTimeout(() => {
           animationFrameRef.current = requestAnimationFrame(animate);
         }, 33); // 30fps
-      } else {
-        setCurrentPhase(AnimationPhase.Slowing);
       }
+      // 注意：不在这里手动切换阶段，让 useEffect 自动处理阶段切换
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
@@ -432,14 +431,17 @@ export function useLotteryAnimation(
       setSelectedPrizeId(targetPrizeId);
       initializePrizeStates();
 
-      // 添加超时保护：总动画时间不应超过8秒
+      // 添加超时保护：总动画时间不应超过5秒（增加调试时间）
       const timeoutId = setTimeout(() => {
         console.warn('动画超时，强制结束');
+        console.log('当前动画阶段:', currentPhase);
+        console.log('当前目标奖品:', targetPrizeId);
+        console.log('动画状态:', isAnimating);
         setCurrentPhase(AnimationPhase.Idle);
         setIsAnimating(false);
         animationResolveRef.current = null;
         reject(new Error('动画超时'));
-      }, 8000);
+      }, 5000);
 
       // 启动动画序列 - 从准备阶段开始
       setTimeout(() => {
@@ -505,9 +507,12 @@ export function useLotteryAnimation(
     if (!isAnimating || !currentTargetRef.current) return;
 
     const targetPrizeId = currentTargetRef.current;
+    console.log('🔄 动画阶段切换:', currentPhase, '目标奖品:', targetPrizeId);
 
     if (currentPhase === AnimationPhase.Prepare) {
+      console.log('⏱️ 准备阶段开始，持续时间:', config.prepareDuration, 'ms');
       const timer = setTimeout(() => {
+        console.log('✅ 准备阶段完成，切换到滚动阶段');
         setCurrentPhase(AnimationPhase.Spinning);
         animateSpinningPhase(targetPrizeId);
       }, config.prepareDuration);
@@ -517,7 +522,9 @@ export function useLotteryAnimation(
     if (currentPhase === AnimationPhase.Spinning) {
       const spinDuration = config.spinDuration[0] +
         Math.random() * (config.spinDuration[1] - config.spinDuration[0]);
+      console.log('🎰 滚动阶段开始，持续时间:', spinDuration, 'ms');
       const timer = setTimeout(() => {
+        console.log('✅ 滚动阶段完成，切换到减速阶段');
         setCurrentPhase(AnimationPhase.Slowing);
         animateSlowingPhase(targetPrizeId);
       }, spinDuration);
@@ -525,7 +532,9 @@ export function useLotteryAnimation(
     }
 
     if (currentPhase === AnimationPhase.Slowing) {
+      console.log('🐌 减速阶段开始，持续时间:', config.slowingDuration, 'ms');
       const timer = setTimeout(() => {
+        console.log('✅ 减速阶段完成，切换到结果阶段');
         setCurrentPhase(AnimationPhase.Result);
         animateResultPhase(targetPrizeId);
       }, config.slowingDuration);

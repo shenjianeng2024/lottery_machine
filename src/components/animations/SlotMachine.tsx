@@ -318,7 +318,7 @@ export const SlotMachine = React.forwardRef<SlotMachineRef, SlotMachineProps>(({
             columns === 4 && 'grid-cols-4'
           )}
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {prizes.map((prize, index) => {
               const animState = prizeStates[prize.id];
               const glowColor = getPrizeGlowColor(prize.color);

@@ -5,8 +5,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ErrorBoundary, AnimationErrorBoundary, DataErrorBoundary } from '../components/error/ErrorBoundary';
-import { errorReporting, setupGlobalErrorHandling } from '../lib/errorReporting';
+import { ErrorBoundary, AnimationErrorBoundary, DataErrorBoundary } from '../../src/components/error/ErrorBoundary';
+import { errorReporting, setupGlobalErrorHandling } from '../../src/lib/errorReporting';
 
 // 模拟组件
 const ThrowError: React.FC<{ shouldThrow?: boolean }> = ({ shouldThrow = false }) => {

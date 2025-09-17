@@ -7,12 +7,11 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-// import { AnimatedLotteryMachine, AnimatedLotteryMachineState } from '@/components/animations';
-// import { LotteryMachine, LotteryMachineState } from '@/components/lottery/LotteryMachine';
 import { SimpleSlotMachine } from '@/components/animations/SimpleSlotMachine';
 import { HistoryModal } from '@/components/history/HistoryModal';
 import { CycleProgress } from '@/components/progress/CycleProgress';
 import { LotteryStats } from '@/components/stats/LotteryStats';
+import { ModbusStatusDisplay } from '@/components/modbus/ModbusStatusDisplay';
 import type { 
   LotteryState, 
   LotteryResult, 
@@ -24,7 +23,7 @@ import {
   createDefaultPrizes,
   DEFAULT_LOTTERY_CONFIG
 } from '@/types/lottery';
-import { useLotteryStorage } from '@/lib/tauri-api';
+import { useLotteryStorage, modbusWriteSingleSmart } from '@/lib/tauri-api';
 import { TrophyIcon, HistoryIcon, BarChart3Icon } from 'lucide-react';
 import '@/styles/animations.css';
 
@@ -43,6 +42,8 @@ export enum GamePageState {
  */
 export function LotteryGame() {
   const { save, load, autoSave } = useLotteryStorage();
+  
+  // 移除Modbus 601状态检查，抽奖按钮不再依赖601状态
   
   // 页面状态
   const [pageState, setPageState] = useState<GamePageState>(GamePageState.Loading);
@@ -96,6 +97,9 @@ export function LotteryGame() {
    */
   const handleDrawComplete = async (result: LotteryResult, newState?: LotteryState) => {
     setRecentResult(result);
+    
+    // 621寄存器写入已在startUserDraw中完成，这里只处理UI更新
+    
     // 自动保存数据
     if (newState) {
       await autoSave(newState);
@@ -108,7 +112,6 @@ export function LotteryGame() {
    * 处理周期完成事件
    */
   const handleCycleComplete = async (completedCycle: LotteryCycle) => {
-    console.log('周期完成:', completedCycle);
     
     // 自动保存数据
     if (lotteryState) {
@@ -177,6 +180,10 @@ export function LotteryGame() {
   // 开始一次用户触发的抽奖流程，抽中后停留在结果画面
   const startUserDraw = async () => {
     if (!lotteryState || isDrawing) return;
+    
+    // 清除之前的抽奖结果，隐藏"恭喜中奖"界面
+    setRecentResult(null);
+    
     let workingState = lotteryState;
 
     // 计算可抽奖品
@@ -205,44 +212,15 @@ export function LotteryGame() {
     const target = availablePrizes[Math.floor(Math.random() * availablePrizes.length)];
     setIsDrawing(true);
 
-    // 播放动画（返回 Promise，动画结束再更新状态与UI）
+    // 播放动画（结果处理交给SimpleSlotMachine的onAnimationComplete回调）
+    // 621寄存器写入现在由抽奖引擎处理
     // @ts-ignore - 临时使用全局引用
     if (window.__slotMachineRef?.startAnimation) {
       await window.__slotMachineRef.startAnimation(target.id);
+    } else {
+      // 如果动画引用不可用，直接结束抽奖状态
+      setIsDrawing(false);
     }
-
-    // 动画结束：更新抽奖数据与展示“恭喜中奖”
-    const prev = workingState;
-    const drawNumber = prev.currentCycle.results.length + 1;
-    const result: LotteryResult = {
-      prizeId: target.id,
-      timestamp: Date.now(),
-      cycleId: prev.currentCycle.id,
-      drawNumber,
-    };
-
-    // 更新周期与剩余次数
-    const remaining = { ...prev.currentCycle.remainingDraws };
-    remaining[target.color] = Math.max(0, remaining[target.color] - 1);
-    const updatedCycle = {
-      ...prev.currentCycle,
-      results: [...prev.currentCycle.results, result],
-      remainingDraws: remaining,
-    };
-    const totalRemaining = Object.values(remaining).reduce((s, n) => s + n, 0);
-    if (totalRemaining === 0) {
-      updatedCycle.completed = true;
-      updatedCycle.endTime = Date.now();
-    }
-
-    const newState: LotteryState = {
-      ...prev,
-      currentCycle: updatedCycle,
-    };
-
-    setLotteryState(newState);
-    await handleDrawComplete(result, newState);
-    setIsDrawing(false);
   };
 
   // 加载状态
@@ -346,27 +324,116 @@ export function LotteryGame() {
             </Card>
           )}
 
+          {/* 设备状态显示 */}
+          <ModbusStatusDisplay showDetails={true} compact={false} />
+
           {/* 抽奖机主体 */}
           <div className="bg-background/50 backdrop-blur rounded-lg border p-6">
             {/* 新的动画效果奖品展示 */}
             <SimpleSlotMachine
               prizes={lotteryState.availablePrizes}
               durationMs={1000}
-              onAnimationComplete={() => {}}
+              onAnimationComplete={async (prizeId) => {
+                // 动画完成时，如果正在抽奖，则处理抽奖结果
+                if (isDrawing && lotteryState) {
+                  
+                  // 找到对应的奖品
+                  const prize = lotteryState.availablePrizes.find(p => p.id === prizeId);
+                  if (prize) {
+                    // 创建抽奖结果
+                    const result: LotteryResult = {
+                      id: crypto.randomUUID(),
+                      prizeId: prize.id,
+                      prizeName: prize.name,
+                      prizeColor: prize.color,
+                      timestamp: Date.now(),
+                      cycleId: lotteryState.currentCycle.id,
+                    };
+                    
+                    await handleDrawComplete(result);
+
+                    // 更新抽奖状态
+                    const prev = lotteryState;
+                    const remaining = { ...prev.currentCycle.remainingDraws };
+                    remaining[prize.color] = Math.max(0, remaining[prize.color] - 1);
+                    
+                    const updatedCycle = {
+                      ...prev.currentCycle,
+                      results: [...prev.currentCycle.results, result],
+                      remainingDraws: remaining,
+                    };
+                    
+                    const totalRemaining = Object.values(remaining).reduce((s: number, n: number) => s + n, 0);
+                    if (totalRemaining === 0) {
+                      updatedCycle.completed = true;
+                      updatedCycle.endTime = Date.now();
+                    }
+
+                    const newState: LotteryState = {
+                      ...prev,
+                      currentCycle: updatedCycle,
+                    };
+
+                    setLotteryState(newState);
+                    setIsDrawing(false);
+                  }
+                }
+              }}
               className="mb-8"
             />
             
             {/* 旧抽奖机逻辑暂不使用，改为与动画直接联动状态更新 */}
             
             {/* 自定义控制按钮 */}
-            <div className="flex justify-center">
-              <button 
+            <div className="flex flex-col items-center gap-3">
+              {/* 开始抽奖按钮 */}
+              <button
                 onClick={startUserDraw}
                 disabled={isDrawing}
-                className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-lg font-medium"
               >
-                {isDrawing ? '⏳ 抽奖中…' : '🎰 开始抽奖'}
+                {isDrawing ? "🎰 抽奖中..." : "🎰 开始抽奖"}
               </button>
+              
+              {/* 测试按钮 - 用于测试写入功能 */}
+              <div className="flex gap-2 mt-2">
+                <button 
+                  onClick={async () => {
+                    try {
+                      await modbusWriteSingleSmart(621, 1);
+                    } catch (error) {
+                      console.error('❌ 红色写入失败:', error);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  测试红色
+                </button>
+                <button 
+                  onClick={async () => {
+                    try {
+                      await modbusWriteSingleSmart(621, 2);
+                    } catch (error) {
+                      console.error('❌ 黄色写入失败:', error);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                >
+                  测试黄色
+                </button>
+                <button 
+                  onClick={async () => {
+                    try {
+                      await modbusWriteSingleSmart(621, 3);
+                    } catch (error) {
+                      console.error('❌ 蓝色写入失败:', error);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  测试蓝色
+                </button>
+              </div>
             </div>
           </div>
 
@@ -418,27 +485,6 @@ export function LotteryGame() {
         </div>
       )}
 
-      {/* 固定中奖画面覆盖层：直到下一次点击开始抽奖才关闭 */}
-      {recentResult && !isDrawing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-md p-6 text-center space-y-4">
-            <div className="text-5xl">🎉</div>
-            <h2 className="text-2xl font-bold">恭喜中奖！</h2>
-            <p className="text-lg">
-              抽中了 {lotteryState.availablePrizes.find(p => p.id === recentResult.prizeId)?.name}
-            </p>
-            <div className="pt-2">
-              <button
-                onClick={startUserDraw}
-                disabled={isDrawing}
-                className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                🎰 开始抽奖
-              </button>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

@@ -10,8 +10,9 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, RotateCcw, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Prize } from '@/types/lottery';
+import type { Prize, LotteryResult } from '@/types/lottery';
 import { PrizeColor } from '@/types/lottery';
+import { useModbusStatus } from '@/hooks/useModbusStatus';
 
 /**
  * WinnerModal组件属性接口
@@ -22,6 +23,8 @@ export interface WinnerModalProps {
   isOpen: boolean;
   /** 中奖奖品 */
   winningPrize: Prize | null;
+  /** 抽奖结果（包含Modbus写入状态等） */
+  lotteryResult?: LotteryResult | null;
   /** 关闭弹窗回调 */
   onClose: () => void;
   /** 开始新一轮抽奖回调 */
@@ -104,12 +107,14 @@ const ConfettiPiece: React.FC<{ delay: number; color: string }> = ({ delay, colo
 export function WinnerModal({
   isOpen,
   winningPrize,
+  lotteryResult,
   onClose,
   onStartNewRound,
   autoClose = false, // 已废弃：保留参数以保持向后兼容，但功能已禁用
   autoCloseDelay = 5000 // 已废弃：保留参数以保持向后兼容，但功能已禁用
 }: WinnerModalProps) {
   const [showConfetti, setShowConfetti] = useState(false);
+  const { status, getStatusText } = useModbusStatus(1000);
 
   // 弹窗行为说明：
   // - 中奖后弹窗出现并一直保持显示
@@ -129,6 +134,10 @@ export function WinnerModal({
   if (!winningPrize) return null;
 
   const theme = getPrizeTheme(winningPrize.color);
+  const statusInfo = getStatusText();
+  
+  // 只有当601=0且602=0时才显示按钮
+  const shouldShowButtons = status.softwareStatus === 0 && status.deliveryStatus === 0;
 
   return (
     <AnimatePresence>
@@ -138,7 +147,6 @@ export function WinnerModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={onClose}
         >
           {/* 彩色纸屑效果 */}
           {showConfetti && (
@@ -172,15 +180,17 @@ export function WinnerModal({
               theme.border,
               theme.glow
             )}>
-              {/* 关闭按钮 */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 right-2 h-8 w-8 rounded-full hover:bg-black/10"
-                onClick={onClose}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              {/* 关闭按钮 - 只在601=0且602=0时显示 */}
+              {shouldShowButtons && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-2 h-8 w-8 rounded-full hover:bg-black/10"
+                  onClick={onClose}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
 
               {/* 中奖标题 */}
               <div className="text-center mb-6">
@@ -244,40 +254,65 @@ export function WinnerModal({
                     </Badge>
                   </div>
                 </motion.div>
+
               </div>
 
-              {/* 操作按钮 */}
+              {/* 设备状态显示 */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                className="flex flex-col gap-3"
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="mb-6"
               >
-                {/* 确认按钮 */}
-                <Button
-                  onClick={onClose}
-                  className="w-full text-lg py-6 bg-emerald-600 hover:bg-emerald-700 text-white"
-                  size="lg"
-                >
-                  <Trophy className="mr-2 h-5 w-5" />
-                  确认收取奖品
-                </Button>
-
-                {/* 再来一次按钮 */}
-                {onStartNewRound && (
-                  <Button
-                    onClick={() => {
-                      onStartNewRound();
-                      onClose();
-                    }}
-                    variant="outline"
-                    className="w-full text-base py-4"
-                  >
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    再来一次
-                  </Button>
-                )}
+                <div className={`${
+                  statusInfo.text === "奖品到达出料口" 
+                    ? "p-4 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 shadow-lg animate-pulse" 
+                    : `p-3 rounded-lg ${statusInfo.bgColor} border`
+                }`}>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className={statusInfo.text === "奖品到达出料口" ? "text-2xl" : "text-xl"}>
+                      {statusInfo.icon}
+                    </span>
+                    <span className={`${
+                      statusInfo.text === "奖品到达出料口" 
+                        ? "font-bold text-lg text-green-700" 
+                        : `font-medium ${statusInfo.color}`
+                    }`}>
+                      {statusInfo.text}
+                    </span>
+                  </div>
+                  {statusInfo.text === "奖品到达出料口" && (
+                    <div className="text-center mt-2">
+                      <span className="text-sm text-green-600 font-medium">🎉 请取走您的奖品 🎉</span>
+                    </div>
+                  )}
+                </div>
               </motion.div>
+
+              {/* 操作按钮 - 只在601=0且602=0时显示 */}
+              {shouldShowButtons && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="flex flex-col gap-3"
+                >
+                  {/* 再来一次按钮 */}
+                  {onStartNewRound && (
+                    <Button
+                      onClick={() => {
+                        onStartNewRound();
+                        onClose();
+                      }}
+                      className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
+                      size="lg"
+                    >
+                      <RotateCcw className="mr-2 h-5 w-5" />
+                      再来一次
+                    </Button>
+                  )}
+                </motion.div>
+              )}
 
               {/* 装饰性背景光晕 */}
               <motion.div

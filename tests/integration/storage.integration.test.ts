@@ -13,14 +13,14 @@ import {
   validateData,
   storageService,
   LotteryStorageService 
-} from '../../lib/tauri-api';
+} from '../../src/lib/tauri-api';
 import { 
   LotteryState, 
   PrizeColor, 
   createNewCycle, 
   createDefaultPrizes,
   DEFAULT_LOTTERY_CONFIG 
-} from '../../types/lottery';
+} from '../../src/types/lottery';
 
 // 模拟测试数据
 const createTestLotteryState = (): LotteryState => {

@@ -9,7 +9,7 @@ import {
   saveLotteryData, 
   loadLotteryData, 
   storageService 
-} from '../../lib/tauri-api';
+} from '../../src/lib/tauri-api';
 import { 
   LotteryState, 
   LotteryCycle,
@@ -18,7 +18,7 @@ import {
   createNewCycle, 
   createDefaultPrizes,
   DEFAULT_LOTTERY_CONFIG 
-} from '../../types/lottery';
+} from '../../src/types/lottery';
 
 // 创建大量历史数据的测试状态
 const createLargeDataState = (cycleCount: number = 100): LotteryState => {

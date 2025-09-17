@@ -3,10 +3,11 @@
  * 使用新的全局状态管理系统，提供一致的用户体验
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SlotMachine, SlotMachineRef } from '@/components/animations/SlotMachine';
 import { WinnerModal } from '@/components/lottery/WinnerModal';
+import { ModbusStatusDisplay } from '@/components/modbus/ModbusStatusDisplay';
 import { useLotteryButton } from '@/hooks/useLotteryButton';
 import {
   useLotteryState,
@@ -17,7 +18,7 @@ import {
   useLotteryContext,
 } from '@/hooks/useLotteryContext';
 import { Button } from '@/components/ui/button';
-import type { Prize } from '@/types/lottery';
+import type { Prize, LotteryResult } from '@/types/lottery';
 
 /**
  * 游戏主界面组件
@@ -28,10 +29,13 @@ function GameMainContent() {
   const { performLottery, isAnimating } = useLotteryDraw();
   const { initNewCycle } = useCycleManagement();
   const slotMachineRef = useRef<SlotMachineRef>(null);
+  
+  // 移除Modbus 601状态检查，抽奖按钮不再依赖601状态
 
   // 中奖弹窗状态
   const [showWinnerModal, setShowWinnerModal] = useState(false);
   const [winningPrize, setWinningPrize] = useState<Prize | null>(null);
+  const [lotteryResult, setLotteryResult] = useState<LotteryResult | null>(null);
 
   // 自定义抽奖逻辑（包含动画和弹窗）
   const handleCustomDraw = async () => {
@@ -40,13 +44,11 @@ function GameMainContent() {
       return;
     }
 
-    console.log('🎲 开始抽奖处理');
+    let result: LotteryResult | null = null;
 
     try {
       // 先执行抽奖逻辑获取结果
-      console.log('📊 执行抽奖逻辑...');
-      const result = await performLottery();
-      console.log('🎯 抽奖结果:', result);
+      result = await performLottery();
 
       // 验证结果
       if (!result || !result.prizeId) {
@@ -54,23 +56,32 @@ function GameMainContent() {
       }
 
       // 然后播放动画效果
-      console.log('🎬 开始播放动画，目标奖品:', result.prizeId);
       const animationStartTime = Date.now();
 
-      await slotMachineRef.current.startAnimation(result.prizeId);
+      try {
+        await slotMachineRef.current.startAnimation(result.prizeId);
+        const animationDuration = Date.now() - animationStartTime;
+      } catch (animationError) {
+        console.error('⚠️ 动画播放失败或超时，但仍显示中奖结果:', animationError);
+        // 动画失败时，仍然继续显示中奖弹窗
+      }
 
-      const animationDuration = Date.now() - animationStartTime;
-      console.log('🏁 动画播放完成，耗时:', animationDuration + 'ms');
-
-      // 动画完成后显示中奖弹窗
+      // 无论动画是否成功，都显示中奖弹窗（因为抽奖逻辑已经成功）
       const prize = state.lotteryState.availablePrizes.find(p => p.id === result.prizeId);
       if (prize) {
         setWinningPrize(prize);
+        setLotteryResult(result);
         setShowWinnerModal(true);
       }
 
     } catch (error) {
       console.error('❌ 抽奖失败:', error);
+      
+      // 只有在抽奖逻辑失败时才重置状态
+      setWinningPrize(null);
+      setLotteryResult(null);
+      setShowWinnerModal(false);
+      
       // 错误处理已由Context统一管理
     }
   };
@@ -79,13 +90,16 @@ function GameMainContent() {
   const {
     buttonText,
     buttonClassName,
-    disabled,
+    disabled: originalDisabled,
     showLoadingAnimation,
     handleClick,
     setPressed,
     setHovered,
     setFocused
   } = useLotteryButton(handleCustomDraw);
+  
+  // 按钮禁用状态（移除Modbus 601状态检查）
+  const disabled = originalDisabled;
 
   // 处理新周期
   const handleNewCycle = async () => {
@@ -100,6 +114,7 @@ function GameMainContent() {
   const handleCloseWinnerModal = () => {
     setShowWinnerModal(false);
     setWinningPrize(null);
+    setLotteryResult(null);
   };
 
   // 再来一次（关闭弹窗后立即开始新抽奖）
@@ -125,6 +140,9 @@ function GameMainContent() {
           prizes={state.lotteryState.availablePrizes}
           performanceMode="normal"
         />
+
+        {/* 信号图标显示在左上角 */}
+        <ModbusStatusDisplay position="top-left" />
 
         {/* 控制：统一的抽奖按钮 */}
         <div className="mt-6 flex justify-center gap-3">
@@ -190,6 +208,7 @@ function GameMainContent() {
       <WinnerModal
         isOpen={showWinnerModal}
         winningPrize={winningPrize}
+        lotteryResult={lotteryResult}
         onClose={handleCloseWinnerModal}
         onStartNewRound={handleStartNewRound}
         autoClose={false}

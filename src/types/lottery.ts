@@ -42,6 +42,14 @@ export interface LotteryResult {
   cycleId: string;
   /** 周期内第几次抽奖 */
   drawNumber: number;
+  /** Modbus写入状态 */
+  modbusWriteStatus?: {
+    success: boolean;
+    address: number;
+    value: number;
+    message?: string;
+    error?: string;
+  };
 }
 
 /**

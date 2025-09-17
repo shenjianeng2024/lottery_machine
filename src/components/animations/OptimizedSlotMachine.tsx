@@ -432,7 +432,7 @@ export const OptimizedSlotMachine = forwardRef<OptimizedSlotMachineRef, Optimize
           )}
           style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
         >
-          <AnimatePresence mode="wait">
+           <AnimatePresence>
             {prizeGrid.map((prize, index) => (
               <motion.div
                 key={`${prize.id}-${prize.gridIndex}`}
