@@ -22,7 +22,15 @@
       "Bash(git reset:*)",
       "Bash(git remote add:*)",
       "Bash(git remote remove:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "mcp__mastergo-magic-mcp__version_0_1_2",
+      "mcp__mastergo-magic-mcp__mcp__getDsl",
+      "Bash(pnpm lint:*)",
+      "Bash(npx eslint:*)",
+      "mcp__filesystem__move_file",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(xargs sed:*)",
+      "Bash(xargs rm:*)"
     ],
     "deny": [],
     "ask": []

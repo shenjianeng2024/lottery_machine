@@ -118,3 +118,155 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* 新UI设计的自定义样式 */
+@layer utilities {
+  /* 径向渐变 */
+  .bg-gradient-radial {
+    background: radial-gradient(var(--tw-gradient-stops));
+  }
+  
+  /* Source Han Sans字体 */
+  .font-source-han-sans {
+    font-family: 'Source Han Sans', 'Noto Sans CJK SC', sans-serif;
+  }
+  
+  /* 硬件加速动画 */
+  .hw-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* 抽奖动画相关 */
+  .lottery-glow {
+    box-shadow: 0 0 20px rgba(var(--glow-color), 0.6);
+  }
+
+  .lottery-glow-strong {
+    box-shadow: 0 0 40px rgba(var(--glow-color), 1);
+  }
+
+  /* 自定义动画 */
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  .animation-delay-100 {
+    animation-delay: 0.1s;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 0.15s;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
+
+  /* 轮流浮动动画类 */
+  .animate-float-sequence {
+    animation: rhythmFloat 1.2s ease-in-out infinite;
+  }
+
+  .animate-slot-float {
+    animation: slotFloat 1s ease-in-out infinite;
+  }
+
+  /* 圆锥渐变 */
+  .bg-gradient-conic {
+    background: conic-gradient(var(--tw-gradient-stops));
+  }
+}
+
+/* 老虎机动画关键帧定义 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-2px); }
+  20% { transform: translateX(2px); }
+  30% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  50% { transform: translateX(-1px); }
+  60% { transform: translateX(1px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+  90% { transform: translateX(-1px); }
+}
+
+@keyframes flash {
+  0% { opacity: 1; box-shadow: 0 0 5px currentColor; }
+  100% { opacity: 0.7; box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+}
+
+@keyframes fastPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.05); opacity: 0.3; }
+}
+
+@keyframes bounceSlot {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-8px) scale(1.2); }
+}
+
+@keyframes colorChange {
+  0% { filter: hue-rotate(0deg) brightness(1.2); }
+  25% { filter: hue-rotate(90deg) brightness(1.5); }
+  50% { filter: hue-rotate(180deg) brightness(1.8); }
+  75% { filter: hue-rotate(270deg) brightness(1.5); }
+  100% { filter: hue-rotate(360deg) brightness(1.2); }
+}
+
+@keyframes scale {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -50%) scale(1.3); }
+}
+
+@keyframes slideRight {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes slideLeft {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100vw); }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100vh); }
+}
+
+/* 轮流浮动动画 */
+@keyframes floatSequence {
+  0%, 20% { transform: translateY(0) scale(1); }
+  10% { transform: translateY(-20px) scale(1.08); }
+  30%, 100% { transform: translateY(0) scale(1); }
+}
+
+/* 老虎机转轮浮动效果 */
+@keyframes slotFloat {
+  0% { transform: translateY(0) rotateX(0deg); }
+  25% { transform: translateY(-15px) rotateX(5deg); }
+  50% { transform: translateY(-25px) rotateX(0deg); }
+  75% { transform: translateY(-15px) rotateX(-5deg); }
+  100% { transform: translateY(0) rotateX(0deg); }
+}
+
+/* 强化版浮动 - 更有节奏感 */
+@keyframes rhythmFloat {
+  0%, 40% { transform: translateY(0) scale(1) rotateZ(0deg); }
+  20% { transform: translateY(-25px) scale(1.1) rotateZ(2deg); }
+  60%, 100% { transform: translateY(0) scale(1) rotateZ(0deg); }
+}

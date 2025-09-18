@@ -49,8 +49,8 @@ const COLOR_CONFIG = {
     progressClass: 'bg-yellow-500',
     icon: '🟡'
   },
-  [PrizeColor.Blue]: {
-    name: '蓝色',
+  [PrizeColor.Green]: {
+    name: '绿色',
     bgClass: 'bg-blue-100 dark:bg-blue-900',
     textClass: 'text-blue-800 dark:text-blue-200',
     progressClass: 'bg-blue-500',
@@ -80,7 +80,7 @@ export function LotteryStats({
     const colorPercentages = {
       [PrizeColor.Red]: totalDraws > 0 ? (colorStats[PrizeColor.Red] / totalDraws) * 100 : 0,
       [PrizeColor.Yellow]: totalDraws > 0 ? (colorStats[PrizeColor.Yellow] / totalDraws) * 100 : 0,
-      [PrizeColor.Blue]: totalDraws > 0 ? (colorStats[PrizeColor.Blue] / totalDraws) * 100 : 0
+      [PrizeColor.Green]: totalDraws > 0 ? (colorStats[PrizeColor.Green] / totalDraws) * 100 : 0
     };
 
     // 找出最常和最少抽中的颜色

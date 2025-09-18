@@ -5,7 +5,7 @@
  * 采用费雪-耶茨洗牌算法确保随机性和公平性
  * 
  * Modbus寄存器机制：
- * - 621: 抽奖结果输出 (红色=1, 黄色=2, 蓝色=3)
+ * - 621: 抽奖结果输出 (红色=1, 绿色=2, 黄色=3)
  * - 601: 软件状态指示 (1=正在选取奖品, 0=奖品到达出料口)
  * - 602: 出料状态指示 (1=奖品到达出料口, 0=奖品被取走)
  * 
@@ -85,10 +85,10 @@ export class LotteryEngineImpl implements LotteryEngine {
         case PrizeColor.Red:
           colorValue = 1;
           break;
-        case PrizeColor.Yellow:
+        case PrizeColor.Green:
           colorValue = 2;
           break;
-        case PrizeColor.Blue:
+        case PrizeColor.Yellow:
           colorValue = 3;
           break;
         default:
@@ -334,7 +334,7 @@ export function validateCycleFairness(cycle: LotteryCycle): boolean {
   const colorCounts = {
     [PrizeColor.Red]: 0,
     [PrizeColor.Yellow]: 0,
-    [PrizeColor.Blue]: 0,
+    [PrizeColor.Green]: 0,
   };
 
   // 这里需要通过 prizeId 反查颜色，暂时简化实现
@@ -345,8 +345,8 @@ export function validateCycleFairness(cycle: LotteryCycle): boolean {
       colorCounts[PrizeColor.Red]++;
     } else if (result.prizeId.includes('yellow')) {
       colorCounts[PrizeColor.Yellow]++;
-    } else if (result.prizeId.includes('blue')) {
-      colorCounts[PrizeColor.Blue]++;
+    } else if (result.prizeId.includes('green')) {
+      colorCounts[PrizeColor.Green]++;
     }
   });
 
@@ -376,7 +376,7 @@ export function validateCycleFairnessWithPrizes(
   const colorCounts = {
     [PrizeColor.Red]: 0,
     [PrizeColor.Yellow]: 0,
-    [PrizeColor.Blue]: 0,
+    [PrizeColor.Green]: 0,
   };
 
   cycle.results.forEach(result => {
@@ -408,7 +408,7 @@ export function generateLotteryStats(cycles: LotteryCycle[], availablePrizes: Pr
   const colorDistribution = {
     [PrizeColor.Red]: 0,
     [PrizeColor.Yellow]: 0,
-    [PrizeColor.Blue]: 0,
+    [PrizeColor.Green]: 0,
   };
 
   let totalDraws = 0;

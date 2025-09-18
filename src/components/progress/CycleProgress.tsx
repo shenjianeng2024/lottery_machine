@@ -47,8 +47,8 @@ const COLOR_CONFIG = {
     progressClass: 'bg-yellow-500',
     icon: '🟡'
   },
-  [PrizeColor.Blue]: {
-    name: '蓝色',
+  [PrizeColor.Green]: {
+    name: '绿色',
     bgClass: 'bg-blue-100 dark:bg-blue-900',
     textClass: 'text-blue-800 dark:text-blue-200',
     progressClass: 'bg-blue-500',
@@ -81,7 +81,7 @@ export function CycleProgress({
     const completedByColor = {
       [PrizeColor.Red]: config.drawsPerColor - currentCycle.remainingDraws[PrizeColor.Red],
       [PrizeColor.Yellow]: config.drawsPerColor - currentCycle.remainingDraws[PrizeColor.Yellow],
-      [PrizeColor.Blue]: config.drawsPerColor - currentCycle.remainingDraws[PrizeColor.Blue]
+      [PrizeColor.Green]: config.drawsPerColor - currentCycle.remainingDraws[PrizeColor.Green]
     };
 
     const progress: CycleProgressType & { completedByColor: Record<PrizeColor, number> } = {

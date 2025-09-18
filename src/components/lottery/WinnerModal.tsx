@@ -58,7 +58,7 @@ function getPrizeTheme(color: PrizeColor) {
         glow: 'shadow-yellow-500/20',
         emoji: '🏆'
       };
-    case PrizeColor.Blue:
+    case PrizeColor.Green:
       return {
         bg: 'bg-blue-50 dark:bg-blue-950/30',
         border: 'border-blue-200 dark:border-blue-800',
@@ -250,7 +250,7 @@ export function WinnerModal({
                     <Badge className={cn('text-white', theme.badge)}>
                       {winningPrize.color === PrizeColor.Red && '红奖'}
                       {winningPrize.color === PrizeColor.Yellow && '黄奖'}
-                      {winningPrize.color === PrizeColor.Blue && '蓝奖'}
+                      {winningPrize.color === PrizeColor.Green && '蓝奖'}
                     </Badge>
                   </div>
                 </motion.div>

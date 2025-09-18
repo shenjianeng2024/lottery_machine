@@ -68,7 +68,7 @@ export interface HistoryModalProps {
 const COLOR_NAMES: Record<PrizeColor, string> = {
   [PrizeColor.Red]: '红色',
   [PrizeColor.Yellow]: '黄色',
-  [PrizeColor.Blue]: '蓝色',
+  [PrizeColor.Green]: '绿色',
 };
 
 /**
@@ -77,7 +77,7 @@ const COLOR_NAMES: Record<PrizeColor, string> = {
 const COLOR_STYLES: Record<PrizeColor, string> = {
   [PrizeColor.Red]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
   [PrizeColor.Yellow]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  [PrizeColor.Blue]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  [PrizeColor.Green]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
 };
 
 /**
@@ -290,7 +290,7 @@ export function HistoryModal({
                 <SelectItem value="">全部颜色</SelectItem>
                 <SelectItem value={PrizeColor.Red}>红色</SelectItem>
                 <SelectItem value={PrizeColor.Yellow}>黄色</SelectItem>
-                <SelectItem value={PrizeColor.Blue}>蓝色</SelectItem>
+                <SelectItem value={PrizeColor.Green}>绿色</SelectItem>
               </SelectContent>
             </Select>
           </div>

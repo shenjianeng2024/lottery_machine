@@ -1,14 +1,14 @@
 import { ErrorBoundary } from './components/error/ErrorBoundary'
 import { LotteryProvider } from './context/LotteryContext'
-import LotteryGameWithContext from './pages/LotteryGameWithContext'
+import LotteryGameNew from './pages/LotteryGameNew'
 import './App.css'
 
 function App() {
-  // 直接进入动画抽奖页（无首页/路由切换）
+  // 使用新的UI设计
   return (
     <ErrorBoundary>
       <LotteryProvider>
-        <LotteryGameWithContext />
+        <LotteryGameNew />
       </LotteryProvider>
     </ErrorBoundary>
   )

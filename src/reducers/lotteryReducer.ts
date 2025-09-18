@@ -33,10 +33,10 @@ export interface LotteryContextState {
   
   // 三色系统当前周期进度
   currentCycleProgress: {
-    red: number;    // 0-2
-    yellow: number; // 0-2
-    blue: number;   // 0-2
-    total: number;  // 0-6
+    red: number;    // 0-1
+    yellow: number; // 0-1
+    green: number;   // 0-1
+    total: number;  // 0-3
   };
   
   // 最近抽奖结果（用于显示）
@@ -60,7 +60,7 @@ export const initialLotteryContextState: LotteryContextState = {
   currentCycleProgress: {
     red: 0,
     yellow: 0,
-    blue: 0,
+    green: 0,
     total: 0,
   },
   recentResult: null,
@@ -75,7 +75,7 @@ function calculateCycleProgress(lotteryState: LotteryState): LotteryContextState
   const colorStats = {
     [PrizeColor.Red]: 0,
     [PrizeColor.Yellow]: 0,
-    [PrizeColor.Blue]: 0,
+    [PrizeColor.Green]: 0,
   };
   
   // 统计当前周期各颜色的中奖次数
@@ -89,7 +89,7 @@ function calculateCycleProgress(lotteryState: LotteryState): LotteryContextState
   return {
     red: colorStats[PrizeColor.Red],
     yellow: colorStats[PrizeColor.Yellow],
-    blue: colorStats[PrizeColor.Blue],
+    green: colorStats[PrizeColor.Green],
     total: currentCycle.results.length,
   };
 }
@@ -358,7 +358,7 @@ export const selectors = {
         state.currentCycleProgress.total !== calculatedProgress.total ||
         state.currentCycleProgress.red !== calculatedProgress.red ||
         state.currentCycleProgress.yellow !== calculatedProgress.yellow ||
-        state.currentCycleProgress.blue !== calculatedProgress.blue
+        state.currentCycleProgress.green !== calculatedProgress.green
       ) {
         issues.push('周期进度统计不一致');
         canAutoFix = true;
@@ -404,7 +404,7 @@ export const selectors = {
       colorStats: {
         red: progress.red,
         yellow: progress.yellow,
-        blue: progress.blue,
+        green: progress.green,
       },
       remainingDraws: currentCycle.remainingDraws,
       isComplete: currentCycle.completed,
@@ -426,7 +426,7 @@ export const selectors = {
     const colorStats = {
       [PrizeColor.Red]: 0,
       [PrizeColor.Yellow]: 0,
-      [PrizeColor.Blue]: 0,
+      [PrizeColor.Green]: 0,
     };
     
     allCycles.forEach(cycle => {

@@ -44,7 +44,7 @@ function getPrizeColorClasses(color: PrizeColor): string {
       return 'border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-100';
     case PrizeColor.Yellow:
       return 'border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-100';
-    case PrizeColor.Blue:
+    case PrizeColor.Green:
       return 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100';
     default:
       return 'border-gray-200 bg-gray-50 text-gray-900 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100';
@@ -78,7 +78,7 @@ function getColorBadgeVariant(color: PrizeColor): "default" | "secondary" | "des
       return 'destructive';
     case PrizeColor.Yellow:
       return 'default';
-    case PrizeColor.Blue:
+    case PrizeColor.Green:
       return 'secondary';
     default:
       return 'outline';
@@ -122,7 +122,7 @@ export function PrizeDisplay({
         >
           {prize.color === PrizeColor.Red && '红'}
           {prize.color === PrizeColor.Yellow && '黄'}
-          {prize.color === PrizeColor.Blue && '蓝'}
+          {prize.color === PrizeColor.Green && '蓝'}
         </Badge>
       </div>
 
@@ -136,11 +136,11 @@ export function PrizeDisplay({
           'rounded-full flex items-center justify-center font-bold transition-all duration-300',
           prize.color === PrizeColor.Red && 'bg-red-500 text-white',
           prize.color === PrizeColor.Yellow && 'bg-yellow-500 text-white',
-          prize.color === PrizeColor.Blue && 'bg-blue-500 text-white'
+          prize.color === PrizeColor.Green && 'bg-blue-500 text-white'
         )}>
           {prize.color === PrizeColor.Red && '🎁'}
           {prize.color === PrizeColor.Yellow && '🏆'}
-          {prize.color === PrizeColor.Blue && '💎'}
+          {prize.color === PrizeColor.Green && '💎'}
         </div>
       </div>
 

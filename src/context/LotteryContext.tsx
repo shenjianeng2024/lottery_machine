@@ -128,7 +128,7 @@ export function LotteryProvider({ children }: LotteryProviderProps) {
 
         const redPrize = pickByIdOrColor('prize_red', PrizeColor.Red);
         const yellowPrize = pickByIdOrColor('prize_yellow', PrizeColor.Yellow);
-        const bluePrize = pickByIdOrColor('prize_blue', PrizeColor.Blue);
+        const greenPrize = pickByIdOrColor('prize_green', PrizeColor.Green);
 
         // 为了类型安全，直接通过字符串判断颜色
         const resolveColor = (prizeId: string): PrizeColor | null => {
@@ -136,12 +136,12 @@ export function LotteryProvider({ children }: LotteryProviderProps) {
           if (fromList) return fromList.color as PrizeColor;
           if (prizeId.includes('red')) return PrizeColor.Red;
           if (prizeId.includes('yellow')) return PrizeColor.Yellow;
-          if (prizeId.includes('blue')) return PrizeColor.Blue;
+          if (prizeId.includes('green')) return PrizeColor.Green;
           return null;
         };
 
-        // 迁移后的奖品（保证最多3个，按红黄蓝顺序存在）
-        let migratedPrizes = [redPrize, yellowPrize, bluePrize].filter(Boolean) as typeof allPrizes;
+        // 迁移后的奖品（保证最多3个，按红绿黄顺序存在）
+        let migratedPrizes = [redPrize, greenPrize, yellowPrize].filter(Boolean) as typeof allPrizes;
         if (migratedPrizes.length !== 3) {
           // 回退到默认奖品，确保是3个
           migratedPrizes = createDefaultPrizes();
@@ -153,7 +153,7 @@ export function LotteryProvider({ children }: LotteryProviderProps) {
         const colorCounts = {
           [PrizeColor.Red]: 0,
           [PrizeColor.Yellow]: 0,
-          [PrizeColor.Blue]: 0,
+          [PrizeColor.Green]: 0,
         } as Record<PrizeColor, number>;
         for (const r of savedData.currentCycle.results) {
           const c = resolveColor(r.prizeId);
@@ -164,11 +164,11 @@ export function LotteryProvider({ children }: LotteryProviderProps) {
         const remainingDraws = {
           [PrizeColor.Red]: Math.max(0, drawsPerColor - colorCounts[PrizeColor.Red]),
           [PrizeColor.Yellow]: Math.max(0, drawsPerColor - colorCounts[PrizeColor.Yellow]),
-          [PrizeColor.Blue]: Math.max(0, drawsPerColor - colorCounts[PrizeColor.Blue]),
+          [PrizeColor.Green]: Math.max(0, drawsPerColor - colorCounts[PrizeColor.Green]),
         } as LotteryState['currentCycle']['remainingDraws'];
 
         const totalRemaining =
-          remainingDraws[PrizeColor.Red] + remainingDraws[PrizeColor.Yellow] + remainingDraws[PrizeColor.Blue];
+          remainingDraws[PrizeColor.Red] + remainingDraws[PrizeColor.Yellow] + remainingDraws[PrizeColor.Green];
         const migratedCycle = {
           ...savedData.currentCycle,
           remainingDraws: remainingDraws as any,

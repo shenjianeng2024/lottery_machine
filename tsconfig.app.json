@@ -34,7 +34,10 @@
     "src/types/lottery.ts",
     "src/lib/tauri-api.ts",
     "src/lib/utils.ts",
-    "src/components/ui/**/*"
+    "src/components/ui/**/*",
+    "src/components/lottery/*New.tsx",
+    "src/pages/*New.tsx",
+    "src/vite-env.d.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",

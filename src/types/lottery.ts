@@ -11,7 +11,7 @@
 export enum PrizeColor {
   Red = 'red',
   Yellow = 'yellow',
-  Blue = 'blue'
+  Green = 'green'
 }
 
 /**
@@ -71,7 +71,7 @@ export interface LotteryCycle {
   remainingDraws: {
     [PrizeColor.Red]: number;
     [PrizeColor.Yellow]: number;
-    [PrizeColor.Blue]: number;
+    [PrizeColor.Green]: number;
   };
 }
 
@@ -121,7 +121,7 @@ export interface LotteryEngine {
     remainingByColor: {
       [PrizeColor.Red]: number;
       [PrizeColor.Yellow]: number;
-      [PrizeColor.Blue]: number;
+      [PrizeColor.Green]: number;
     };
   };
 
@@ -163,7 +163,7 @@ export interface CycleProgress {
   remainingByColor: {
     [PrizeColor.Red]: number;
     [PrizeColor.Yellow]: number;
-    [PrizeColor.Blue]: number;
+    [PrizeColor.Green]: number;
   };
 }
 
@@ -215,7 +215,7 @@ export function createNewCycle(): LotteryCycle {
     remainingDraws: {
       [PrizeColor.Red]: DEFAULT_LOTTERY_CONFIG.drawsPerColor,
       [PrizeColor.Yellow]: DEFAULT_LOTTERY_CONFIG.drawsPerColor,
-      [PrizeColor.Blue]: DEFAULT_LOTTERY_CONFIG.drawsPerColor,
+      [PrizeColor.Green]: DEFAULT_LOTTERY_CONFIG.drawsPerColor,
     },
   };
 }
@@ -233,6 +233,14 @@ export function createDefaultPrizes(): Prize[] {
       description: '价值丰厚的红色奖品',
       value: 100,
     },
+    // 绿色奖品
+    {
+      id: 'prize_green',
+      name: '绿色大奖',
+      color: PrizeColor.Green,
+      description: '价值丰厚的绿色奖品',
+      value: 70,
+    },
     // 黄色奖品
     {
       id: 'prize_yellow',
@@ -240,14 +248,6 @@ export function createDefaultPrizes(): Prize[] {
       color: PrizeColor.Yellow,
       description: '价值丰厚的黄色奖品',
       value: 80,
-    },
-    // 蓝色奖品
-    {
-      id: 'prize_blue',
-      name: '蓝色大奖',
-      color: PrizeColor.Blue,
-      description: '价值丰厚的蓝色奖品',
-      value: 70,
     },
   ];
 }

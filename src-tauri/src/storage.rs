@@ -11,7 +11,7 @@ use tokio::fs as tokio_fs;
 pub enum PrizeColor {
     Red,
     Yellow,
-    Blue,
+    Green,
 }
 
 /**
@@ -49,8 +49,8 @@ pub struct RemainingDraws {
     pub red: u32,
     #[serde(rename = "yellow")]
     pub yellow: u32,
-    #[serde(rename = "blue")]
-    pub blue: u32,
+    #[serde(rename = "green")]
+    pub green: u32,
 }
 
 /**
@@ -268,16 +268,16 @@ fn create_default_state() -> LotteryState {
             results: Vec::new(),
             completed: false,
             remaining_draws: RemainingDraws {
-                red: 2,
-                yellow: 2,
-                blue: 2,
+                red: 1,
+                yellow: 1,
+                green: 1,
             },
         },
         history: Vec::new(),
         available_prizes: create_default_prizes(),
         config: LotteryConfig {
-            draws_per_cycle: 6,
-            draws_per_color: 2,
+            draws_per_cycle: 3,
+            draws_per_color: 1,
         },
     }
 }
@@ -288,46 +288,25 @@ fn create_default_state() -> LotteryState {
 fn create_default_prizes() -> Vec<Prize> {
     vec![
         Prize {
-            id: "prize_red_1".to_string(),
-            name: "红色奖品1".to_string(),
+            id: "prize_red".to_string(),
+            name: "红色奖品".to_string(),
             color: PrizeColor::Red,
             description: "精美红色礼品，价值不菲".to_string(),
             value: 100.0,
         },
         Prize {
-            id: "prize_red_2".to_string(),
-            name: "红色奖品2".to_string(),
-            color: PrizeColor::Red,
-            description: "限量版红色纪念品".to_string(),
-            value: 120.0,
-        },
-        Prize {
-            id: "prize_yellow_1".to_string(),
-            name: "黄色奖品1".to_string(),
+            id: "prize_yellow".to_string(),
+            name: "黄色奖品".to_string(),
             color: PrizeColor::Yellow,
             description: "经典黄色收藏品".to_string(),
             value: 80.0,
         },
         Prize {
-            id: "prize_yellow_2".to_string(),
-            name: "黄色奖品2".to_string(),
-            color: PrizeColor::Yellow,
-            description: "温馨黄色生活用品".to_string(),
-            value: 90.0,
-        },
-        Prize {
-            id: "prize_blue_1".to_string(),
-            name: "蓝色奖品1".to_string(),
-            color: PrizeColor::Blue,
-            description: "清爽蓝色健康产品".to_string(),
+            id: "prize_green".to_string(),
+            name: "绿色奖品".to_string(),
+            color: PrizeColor::Green,
+            description: "清新绿色健康产品".to_string(),
             value: 70.0,
-        },
-        Prize {
-            id: "prize_blue_2".to_string(),
-            name: "蓝色奖品2".to_string(),
-            color: PrizeColor::Blue,
-            description: "优雅蓝色装饰品".to_string(),
-            value: 85.0,
         },
     ]
 }
@@ -347,7 +326,7 @@ fn validate_lottery_state(state: &LotteryState) -> Result<bool, String> {
     let cycle = &state.current_cycle;
     let total_remaining = cycle.remaining_draws.red
         + cycle.remaining_draws.yellow
-        + cycle.remaining_draws.blue;
+        + cycle.remaining_draws.green;
     let completed_draws = cycle.results.len() as u32;
 
     if total_remaining + completed_draws != state.config.draws_per_cycle {
@@ -490,21 +469,21 @@ mod tests {
         let default_state = create_default_state();
 
         // 验证默认配置
-        assert_eq!(default_state.config.draws_per_cycle, 6);
-        assert_eq!(default_state.config.draws_per_color, 2);
+        assert_eq!(default_state.config.draws_per_cycle, 3);
+        assert_eq!(default_state.config.draws_per_color, 1);
 
         // 验证默认奖品
-        assert_eq!(default_state.available_prizes.len(), 6);
-        assert_eq!(default_state.available_prizes.iter().filter(|p| matches!(p.color, PrizeColor::Red)).count(), 2);
-        assert_eq!(default_state.available_prizes.iter().filter(|p| matches!(p.color, PrizeColor::Yellow)).count(), 2);
-        assert_eq!(default_state.available_prizes.iter().filter(|p| matches!(p.color, PrizeColor::Blue)).count(), 2);
+        assert_eq!(default_state.available_prizes.len(), 3);
+        assert_eq!(default_state.available_prizes.iter().filter(|p| matches!(p.color, PrizeColor::Red)).count(), 1);
+        assert_eq!(default_state.available_prizes.iter().filter(|p| matches!(p.color, PrizeColor::Yellow)).count(), 1);
+        assert_eq!(default_state.available_prizes.iter().filter(|p| matches!(p.color, PrizeColor::Green)).count(), 1);
 
         // 验证默认周期
         assert!(!default_state.current_cycle.completed);
         assert_eq!(default_state.current_cycle.results.len(), 0);
-        assert_eq!(default_state.current_cycle.remaining_draws.red, 2);
-        assert_eq!(default_state.current_cycle.remaining_draws.yellow, 2);
-        assert_eq!(default_state.current_cycle.remaining_draws.blue, 2);
+        assert_eq!(default_state.current_cycle.remaining_draws.red, 1);
+        assert_eq!(default_state.current_cycle.remaining_draws.yellow, 1);
+        assert_eq!(default_state.current_cycle.remaining_draws.green, 1);
     }
 
     #[test]

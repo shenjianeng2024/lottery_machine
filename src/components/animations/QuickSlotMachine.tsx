@@ -11,10 +11,10 @@ import { PrizeDisplay } from '@/components/lottery/PrizeDisplay';
 const mockPrizes = [
   { id: 'red1', color: 'red', name: '红色大奖', description: '价值丰厚的红色奖品' },
   { id: 'yellow1', color: 'yellow', name: '黄色大奖', description: '价值丰厚的黄色奖品' },
-  { id: 'blue1', color: 'blue', name: '蓝色大奖', description: '价值丰厚的蓝色奖品' },
+  { id: 'blue1', color: 'green', name: '绿色大奖', description: '价值丰厚的绿色奖品' },
   { id: 'red2', color: 'red', name: '红色好礼', description: '精美的红色礼品' },
   { id: 'yellow2', color: 'yellow', name: '黄色好礼', description: '精美的黄色礼品' },
-  { id: 'blue2', color: 'blue', name: '蓝色好礼', description: '精美的蓝色礼品' },
+  { id: 'blue2', color: 'green', name: '绿色好礼', description: '精美的绿色礼品' },
 ];
 
 export const QuickSlotMachine = () => {

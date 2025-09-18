@@ -26,7 +26,7 @@ export interface HistoryStats {
   colorStats: {
     [PrizeColor.Red]: number;
     [PrizeColor.Yellow]: number;
-    [PrizeColor.Blue]: number;
+    [PrizeColor.Green]: number;
   };
   /** 平均每周期完成时间（毫秒） */
   averageCycleTime: number;
@@ -201,7 +201,7 @@ export function useLotteryHistory(lotteryState: LotteryState) {
     const colorStats = {
       [PrizeColor.Red]: 0,
       [PrizeColor.Yellow]: 0,
-      [PrizeColor.Blue]: 0
+      [PrizeColor.Green]: 0
     };
 
     allResults.forEach(result => {

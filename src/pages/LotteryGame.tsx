@@ -156,7 +156,7 @@ export function LotteryGame() {
     const colorStats = {
       [PrizeColor.Red]: 0,
       [PrizeColor.Yellow]: 0,
-      [PrizeColor.Blue]: 0
+      [PrizeColor.Green]: 0
     };
     
     // 统计当前周期各颜色的中奖次数
@@ -409,10 +409,22 @@ export function LotteryGame() {
                 >
                   测试红色
                 </button>
-                <button 
+                <button
                   onClick={async () => {
                     try {
                       await modbusWriteSingleSmart(621, 2);
+                    } catch (error) {
+                      console.error('❌ 绿色写入失败:', error);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  测试绿色
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await modbusWriteSingleSmart(621, 3);
                     } catch (error) {
                       console.error('❌ 黄色写入失败:', error);
                     }
@@ -420,18 +432,6 @@ export function LotteryGame() {
                   className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
                 >
                   测试黄色
-                </button>
-                <button 
-                  onClick={async () => {
-                    try {
-                      await modbusWriteSingleSmart(621, 3);
-                    } catch (error) {
-                      console.error('❌ 蓝色写入失败:', error);
-                    }
-                  }}
-                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  测试蓝色
                 </button>
               </div>
             </div>

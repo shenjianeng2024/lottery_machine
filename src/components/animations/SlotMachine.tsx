@@ -144,7 +144,7 @@ function getPrizeGlowColor(color: string): string {
   switch (color) {
     case 'red': return '239, 68, 68';
     case 'yellow': return '245, 158, 11';
-    case 'blue': return '59, 130, 246';
+    case 'green': return '59, 130, 246';
     default: return '156, 163, 175';
   }
 }

@@ -325,6 +325,7 @@ impl ModbusClient {
     }
 
     /// 更新配置
+    #[allow(dead_code)]
     pub async fn update_config(&mut self, new_config: ModbusConfig) {
         // 如果配置发生变化，需要重新连接
         if self.config.host != new_config.host || self.config.port != new_config.port {
